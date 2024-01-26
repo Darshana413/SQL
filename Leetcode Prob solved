@@ -1,0 +1,446 @@
+/*1.Write an SQL query that reports all the possible matches of the league. 
+Note that every two teams play two matches with each other, with one team being the home_team once and the other time being the away_team. 
+Return the result table in any order. The query result format is in the following example.*/
+
+Create table Teams(
+Teams_name varchar(20))
+
+insert into Teams values ('Leetcode FC'),('Ahly SC'), ('Real Madrid')
+
+Select * from Teams
+
+select A.Teams_name as home_team, B.Teams_name as away_team from Teams A
+join Teams B
+on A.Teams_name <> B.Teams_name
+
+
+/*2. Write an SQL query that reports the spending of each user. Return the resulting table ordered by spending in descending order. In case of a tie, order them by user_id in ascending order. The query result format is in the following example.
+This question was asked in an Amazon company interview.
+*/
+
+Create Table Sales (sale_id smallint, product_id smallint, user_id int, quantity int)
+Create Table Products (product_id smallint, price int)
+
+insert into Sales values (1,1,101, 10), (2,2,101,1), (3,3,102,3), (4,3,102,2) ,(5,2,103,3)
+insert into Products values (1,10), (2,25), (3,15)
+
+select * from Sales
+select * from Products
+
+select user_id, sum(quantity * price) as spending from Sales S, Products P
+where S.product_id = P.product_id
+group by user_id
+order by user_id
+
+
+/*3. Write an SQL query to report the number of unique subjects each teacher teaches in the university. Return the result table in any order. The query result format is shown in the following example.
+This question was asked a Capgemini company interview.*/
+
+create table teacher(teacher_id smallint, subject_id smallint, dept_id smallint)
+
+insert into teacher values (1,2,3), (1,2,4), (1,3,3), (2,1,1), (2,2,1), (2,3,1), (2,4,1)
+
+select teacher_id, count(distinct subject_id) from teacher
+group by teacher_id
+
+
+/*4. The Olympic table is sorted according to the following rules: 
+The country with more gold medals comes first. If there is a tie in the gold medals, the country with more silver medals comes first. 
+If there is a tie in the silver medals, the country with more bronze medals comes first. 
+If there is a tie in the bronze medals, the countries with the tie are sorted in ascending order lexicographically. 
+Write an SQL query to sort the Olympic table The query result format is shown in the following example.
+*/
+
+create table olympic( country varchar(10), gold int, silver int, bronze int)
+insert into olympic values ('Israel', 2,2,3), ('Egypt',2,2,2)
+insert into olympic values('SouthSudan',0,0,1)
+
+select * from olympic
+order by gold desc,silver desc,bronze desc,country
+
+
+/*5. Two elements can form a bond if one of them is 'Metal' and the other is 'Nonmetal'. 
+Write an SQL query to find all the pairs of elements that can form a bond. Return the result table in any order. 
+The query result format is in the following example.*/
+
+create table elements(symbol varchar(5), type varchar(20), electrons int)
+
+insert into elements values ('He', 'Noble', 0), ('Na', 'Metal', 1), ('Ca', 'metal', 2), ('La', 'Metal', 3), ('Cl', 'Nonmetal' ,1), ('O', 'Nonmetal', 2), ('N', 'Nonmetal', 2)
+
+select M.symbol as Metals, N.symbol as Nonmetal from elements M
+join elements N
+on M.type = 'Metal' and N.type = 'Nonmetal' and M.symbol <> N.symbol
+
+
+/*6. Write an SQL query to report each person's name followed by the first letter of their profession enclosed in parentheses. 
+Return the result table ordered by person_id in descending order. The query result format is shown in the following example.*/
+
+create table person( person_id int, name varchar(20), profession varchar(20))
+insert into person values (1, 'Alex', 'Singer'), (3, 'Alice', 'Actor'), (2, 'Bob', 'Player'), (4, 'Messi', 'Doctor'),(6, 'Tyson', 'Engineer'), (5, 'Meir', 'Lawyer')
+
+select person_id, concat(name,'(',Left(profession, 1),')') as name from person
+order by person_id desc
+
+/*7. Write an SQL query to find the last time when each bike was used. 
+Return the result table ordered by the bikes that were most recently used. The query result format is in the following example.*/
+
+create table Bikess(ride_id int, bike_number varchar(20), start_time datetime , end_time datetime)
+insert into Bikess values (1, 'W00576', '2012-03-25 11:30:00', '2012-03-25 12:40:00'),
+(2, 'W00300', '2012-03-25 10:30:00', '2012-03-25 10:30:50'),
+(3, 'W00455', '2012-03-26 14:30:00', '2012-03-26 17:40:00'),
+(4, 'W00455', '2012-03-25 12:30:00', '2012-03-25 13:40:00'),
+(5, 'W00576', '2012-03-25 08:10:00', '2012-03-25 09:10:00'),
+(6, 'W00576', '2012-03-8 02:30:00', '2012-03-28 02:50:00')
+
+select bike_number, max(end_time) from Bikess
+group by bike_number
+order by max(end_time) desc
+
+
+/*8. Employees can belong to multiple departments. When the employee joins other departments, they need to decide which department is their primary department. Note that when an employee belongs to only one department, their primary column is 'N'. Write an SQL query to report all the employees with their primary department. For employees who belong to one department, report their only department. Return the result table in any order. The query result format is in the following example.
+
+This question was asked in a Facebook company interview.
+*/
+
+create table employee(employee_id int, dept_id int, primary_flag varchar(1))
+
+insert into employee values (1,1,'N'), (2,1,'Y'), (2,2,'N'),(3,3,'N'),(4,2,'N'),(4,3,'Y'),(4,4,'N')
+
+select employee_id , dept_id as Primary_dept from employee where primary_flag = 'Y'
+union
+select e.employee_id, e.dept_id as Primary_dept from employee e 
+where primary_flag = 'N' and e.employee_id not in (select distinct employee_id from employee where primary_flag = 'Y')
+
+
+/*9. Write an SQL query to report all the sessions that did not get shown any ads. Return the result table in any order. 
+The query result format is in the following example.
+This question was asked in an Amazon company interview.
+*/
+
+Create table playback(session_id int, customer_id int, start_time int, end_time int)
+create table ads(add_id int, customer_id int, timestamp int)
+insert into playback values(1,1,1,5), (2,1,15,23),(3,2,10,12),(4,2,17,28),(5,2,2,8)
+insert into ads values(1,1,5), (2,2,17),(3,2,20)
+
+select * from playback
+select * from ads
+
+select session_id from playback where session_id not in (select session_id from playback, ads where
+playback.customer_id = ads.customer_id and timestamp between start_time and	end_time)
+
+/*10. Write an SQL query to convert each date in Days into a string formatted as "day_name, month_name day, year". 
+Return the result table in any order. The query result format is in the following example.
+*/
+
+create table days(day date)
+insert into days values ('2022-04-12'), ('2021-08-09'), ('2020-06-26')
+
+select CONCAT(datename(weekday, day), ', ', datename(month,day), ' ', datepart(day,day), ', ', datepart(year,day))as date from days
+
+
+/*11. Write an SQL query to calculate the bonus of each employee. 
+The bonus of an employee is 100% of their salary if the ID of the employee is an odd number and the employee name does not start with the character 'M'. 
+The bonus of an employee is 0 otherwise. Return the result table ordered by employee_id. The query result format is in the following example.
+This question was asked by an Apple company interview.
+*/
+create table employees(emp_id int, name varchar(20), salary int)
+insert into employees values(2,'Meir',3000), (3, 'Michael', 3800),(7, 'Addylyn', 7400), (8, 'Juan', 6100), (9, 'Kannon', 7700)
+
+select emp_id, case when emp_id%2 <> 0 and left(name,1) <> 'M' then salary else 0 end as bonus from employees
+
+/*12. Write an SQL query to report the IDs of the low-quality problems. 
+A LeetCode problem is low-quality if the like percentage of the problem 
+(number of likes divided by the total number of votes) is strictly less than 60%. 
+Return the result table ordered by problem_id in ascending order. The query result format is in the following example.*/
+
+create table problems(prob_id int, likes int, dislikes int)
+
+insert into problems values (6,1290,425),(11,2677,8659),(1,4446,2760),(7,8569,6086),(13,2050,4164),(10,9002,7446)
+select * from problems
+
+select prob_id from problems where likes*100/(likes+dislikes) < 60
+
+/*13. There is a competition between New York University and California University. 
+The competition is held between the same number of students from both universities. 
+The university that has more excellent students wins the competition. 
+If the two universities have the same number of excellent students, the competition ends in a draw. 
+An excellent student is a student that scored 90% or more in the exam. 
+Write an SQL query to report: "New York University" if New York University wins the competition. 
+"California University" if California University wins the competition. "No Winner" if the competition ends in a draw. 
+The query result format is in the following example.
+
+This question was asked in a Walmart Global Tech company.
+*/
+
+create table newyorks(stu_id int, score int)
+create table californias(stu_id int, score int)
+
+insert into newyorks values(1,90),(2,87)
+insert into californias values (2,89),(3,88)
+
+with NY_count as (select count(*) as NY_Excel from newyorks where score >= 90),
+CA_count as (select count(*) as CA_Excel from californias where score >= 90)
+select case when NY_Excel > CA_Excel then 'Newyork University' 
+when NY_Excel < CA_Excel then 'California University'
+else  'No Winner'
+end as winner from NY_count, CA_count
+
+/*14. Write an SQL query to show the unique ID of each user, If a user does not have a unique ID replace just show null. 
+Return the result table in any order. The query result format is in the following example.
+
+This question was asked in a Point72 company interview.
+*/
+
+create table emp( id int, name varchar(20))
+create table empuni(id int, unique_id int)
+
+insert into emp values (1, 'Alice'), (7, 'Bob'),(11, 'Meir'), (90, 'Winstion'), (3, 'Jonathan')
+insert into empuni values (3,1), (11,2), (90,3)
+
+select name, unique_id from emp left join empuni on emp.id = empuni.id
+
+
+/*15. Write an SQL query to report the patient_id, patient_name and conditions of the patients who have Type I Diabetes. 
+Type I Diabetes always starts with DIAB1 prefix. Return the result table in any order. 
+The query result format is in the following example.*/
+
+create table cond(condi varchar(20))
+insert into cond values('YFEV Cough'), ('DIAB100 MIOP'), ('ACNE DIAB100'),('DIAB201')
+select * from cond
+
+select patient_id, patient_name,condi from cond where condi like '%DIAB1%';
+
+/*16. Write an SQL query to find the IDs of the invalid tweets. 
+The tweet is invalid if the number of characters used in the content of the tweet is strictly greater than 15. 
+Return the result table in any order. The query result format is in the following example.
+This question was asked in a Twitter company interview.
+*/
+
+create table tweet(tweet_id int, cahr varchar(50))
+
+insert into tweet values(1, 'Vote for Biden'),(2, 'Let us make America Great Again!')
+
+select tweet_id from tweet where LEN(cahr) > 15
+
+/*17. You want to know how long a user visits your application. You decided to create bins of "[0-5>", "[5-10>", "[10-15>", and "15 minutes or more" and 
+count the number of sessions on it. Write an SQL query to report the (bin, total). Return the result table in any order. 
+The query result format is in the following example.
+This question was asked in a Twitch company interview.
+*/
+
+create table sessions (session_id int, duration int)
+insert into sessions values(1,30), (2,199), (3,299),(4,580),(5,1000)
+
+
+
+select bin, count(*) from 
+(select case 
+when duration < 500 then '[0-5>'
+when duration < 1000 then '[5-10>'
+when duration < 1500 then '[10-15>'
+else '15 minutes or more'
+end as bin
+from sessions) a group by bin
+
+
+/*18. Write an SQL query to report the distinct titles of the kid-friendly movies streamed in June 2020. 
+Return the result table in any order. The query result format is in the following example.
+This question was asked */
+
+create table tvprog(prog_date datetime, content_id int, channel varchar(20))
+create table content(content_id int, title varchar(20) ,kids_content varchar(2) ,content_type varchar(10))
+
+insert into tvprog values('2020-06-10 08:00', 1, 'LC'),('2020-05-11 12:00', 2, 'LC'),('2020-05-12 12:00', 3, 'LC'),('2020-05-13 14:00', 4, 'Disney'),
+('2020-06-18 14:00', 4, 'Disney'),('2020-07-15 16:00', 5, 'Disney')
+
+insert into content values(1, 'Leetcode', 'N','Movies'),(2, 'Alg', 'Y', 'Series'),(3, 'Data', 'N', 'Series'),(4, 'Aladdin', 'Y', 'Movies'),(5, 'Cindrella', 'Y', 'Movies')
+
+select title from content, tvprog where tvprog.content_id = content.content_id and kids_content = 'Y' and 
+content_type = 'Movies' and year(prog_date) = '2020' and month(prog_date) = '6'
+
+
+/*19. Since table Sales was filled manually in the year 2000, product_name may contain leading and/or trailing white spaces, 
+also they are case-insensitive. Write an SQL query to report product_name in lowercase without leading or trailing white spaces. sale_date in the format ('YYYY-MM'). total the number of times the product was sold in this month. Return the result table ordered by product_name in ascending order. In case of a tie, order it by sale_date in ascending order. The query result format is in the following example.
+*/
+
+create table sale(sales_id int, prod_name varchar(20), sales_date date)
+insert into sale values(1,'LCPHONE','2000-1-16'),(2,'LCPhone','2000-1-17'),(3,'LcPh0ne','2000-2-18'),(4,'LCKeyCHAiN','2000-2-19'),(5,'LCKeyChain','2000-2-28'),(6,'Matyroshka','2000-3-31')
+
+select lower(prod_name) as prod_name, concat(year(sales_date),'-',month(sales_date)) as sale_date, count(*) as total from sale 
+group by concat(year(sales_date),'-',month(sales_date)), prod_name
+
+
+/*20. Write an SQL query to find the type of weather in each country for November 2019. The type of weather is: Cold if the average weather_state is less than or equal 15, Hot if the average weather_state is greater than or equal to 25, and Warm otherwise. Return result table in any order. The query result format is in the following example.
+This question was asked in a Point72 company interview.
+*/
+
+select country_name, case when average(weather_state) over (partition by country_name) <= 15 then 'Cold'
+when average(weather_state) over (partition by country_name) >= 25 then 'Hot'
+else 'Warm'
+end as weather_type from countries, weather where countries.country_id = weather.country_id
+
+
+/*21. Write an SQL query to report the IDs of all the products that were ordered three or more times in two consecutive years. Return the result table in any order. 
+The query result format is shown in the following example.
+This question was asked in an Amazon company interview.
+*/
+
+create table orders(order_id int, prod_id int, quantity int, purchase_date date)
+insert into orders values(1,1,7,'2020-03-16'),(2,1,4,'2020-12-02'),(3,1,7,'2020-05-10'),(4,1,6,'2021-12-23'),
+(5,1,5,'2021-05-21'),(6,1,6,'2021-10-11'),(7,2,6,'2022-10-11')
+
+select distinct prod_id from (select count(*) as total , prod_id from orders group by prod_id, year(purchase_date)) a where total>=3
+
+
+/*22. Write an SQL query to report: the number of the tasks that were submitted during the weekend (Saturday, Sunday) as weekend_cnt, 
+and the number of the tasks that were submitted during the working days as working_cnt. Return the result table in any order. 
+The query result format is shown in the following example.
+*/
+
+
+create table tables (submit_date date)
+insert into tables values('2022-06-13'),('2022-06-14'),('2022-06-15'),('2022-06-18'), ('2022-06-19'),('2022-06-19')
+
+
+
+
+select sum(weekend_cnt) as Weekend_cnt, sum(working_cnt) as Working_cnt from (select case when DATENAME(weekday, submit_date) in ('Saturday', 'Sunday') then 1 
+end as weekend_cnt, case when DATENAME(weekday, submit_date) not in ('Saturday', 'Sunday') then 1 
+end as working_cnt from tables) a 
+
+
+/*23. Write an SQL query to rearrange the Genders table such that the rows alternate between 'female', 'other', and 'male' in order. 
+The table should be rearranged such that the IDs of each gender are sorted in ascending order. 
+Return the result table in the mentioned order. The query result format is shown in the following example.
+*/
+
+create table genders(user_id int, gender varchar(10))
+insert into genders values(4, 'male'),(7,'female'),(2, 'other'),(5,'male'),(3, 'female'),(8,'male'),(6,'other'),(1, 'other'),(9,'female')
+
+with cte as (select *, rank() over (partition by gender order by user_id) as rank from genders)
+select user_id, gender from cte order by rank,  case when gender = 'female' then 1
+when gender = 'other' then 2 else 3 end ,user_id 
+
+
+/*24. Write an SQL query to report the day that has the maximum recorded degree in each city. If the maximum degree was recorded for the same city multiple times, 
+return the earliest day among them. Return the result table ordered by city_id in ascending order. The query result format is shown in the following example.
+*/
+
+create table weather(city int, day date, degree int)
+insert into weather values (1, '2022-01-07', -12),(1, '2022-03-07', 5), (1, '2022-07-07', 24),(2, '2022-08-07', 37),(2, '2022-08-17', 37),(3, '2022-02-07', -7),(3, '2022-12-07', -6)
+
+select city, min(day), degree from weather where degree in (select max(degree) as degree  from weather group by city) 
+group by city,degree
+
+
+/*25. Write an SQL query to replace the null values of drink with the name of the drink of the previous row that is not null. It is guaranteed that the drink of the first row of the table is not null. Return the result table in the same order as the input. The query result format is shown in the following example.
+This question was asked in a Deloitte company interview.*/
+
+create table coffeshop (id int, drink varchar(40))
+insert into coffeshop values (9, 'Mezcal Margarita'),(6, 'null'),(7,'null'),(3,'Americano'),(1,'Daiquiri'),(2, 'null')
+
+
+ WITH UpdatedCTE AS (
+  SELECT
+    id,
+    CASE
+      WHEN drink = 'null' THEN LAG(drink) OVER (ORDER BY case when id = 9 then 1 when id = 7 then 2 when id = 6 then 3 when id = 3 then 4 when id = 1 then 5 else 6 end)
+      ELSE drink
+    END AS drink
+  FROM
+    coffeshops
+)
+SELECT
+  id,
+  CASE
+      WHEN drink = 'null' THEN LAG(drink) OVER (ORDER BY case when id = 9 then 1 when id = 7 then 2 when id = 6 then 3 when id = 3 then 4 when id = 1 then 5 else 6 end)
+      ELSE drink
+    END AS drink
+FROM
+  UpdatedCTE;
+
+
+/*26. In a company, each employee must work a certain number of hours every month. Employees work in sessions. 
+The number of hours an employee worked can be calculated from the sum of the number of minutes the employee worked in all of their sessions. 
+The number of minutes in each session is rounded up. For example, if the employee worked for 51 minutes and 2 seconds in a session, we consider it 52 minutes. 
+Write an SQL query to report the IDs of the employees that will be deducted. In other words, report the IDs of the employees that did not work the needed hours. Return the result table in any order. The query result format is in the following example.
+This question was asked in an Amazon company interview.
+*/
+
+create table Employess(empid int, needed_hours int)
+create table Logs(empid int, in_time datetime, out_time datetime)
+
+insert into Employess values(1,20),(2,12),(3,2)
+insert into Logs values(1, '2022-10-01 09:00:00','2022-10-01 17:00:00'),(1, '2022-10-06 09:05:04','2022-10-06 17:09:03'),(1, '2022-10-12 23:00:00','2022-10-13 03:00:01'),(1, '2022-10-29 12:00:00','2022-10-29 23:58:58')
+
+select E.empid from Employess E left join Logs L on E.empid = L.empid 
+group by E.empid, E.needed_hours 
+having sum(DATEDIFF(second, in_time, out_time)/60)/60 < needed_hours
+
+select E.empid, sum(DATEDIFF(second, in_time, out_time)/60)/60, needed_hours from Employess E left join Logs L on E.empid = L.empid 
+group by E.empid, E.needed_hours 
+WITH EmployeeWorkedHours AS (
+  SELECT
+    e.empid AS employee_id,
+    e.needed_hours,
+    COALESCE(SUM((DATEDIFF(MINUTE, l.in_time, l.out_time) / 60.0)), 0) AS total_worked_hours
+  FROM
+    Employess e
+    LEFT JOIN Logs l ON e.empid = l.empid
+  GROUP BY
+    e.empid, e.needed_hours
+)
+SELECT
+  employee_id
+FROM
+  EmployeeWorkedHours
+WHERE
+  total_worked_hours < needed_hours;
+
+
+/*27. If the customer's preferred delivery date is the same as the order date, then the order is called immediate, otherwise, it is scheduled. 
+Write an SQL query to find the percentage of immediate orders on each unique order_date, rounded to 2 decimal places. 
+Return the result table ordered by order_date in ascending order. The query result format is in the following example.
+*/
+
+
+with immediate as(select order_id, count(order_date = customer_pref_delivery_date) as immediate, count(order_id) as order_count from delivery group by order_id)
+select order_id, (immediate*100/order_count) as immediate_percentage from immediate
+
+create table delivery(del_id int, cus_id int, order_date date, customer_pref_date date)
+
+insert into delivery values
+(1,1,'2019-08-01', '2019-08-02'),
+(2,2,'2019-08-01', '2019-08-01'),
+(3,1,'2019-08-01', '2019-08-01'),
+(4,3,'2019-08-02', '2019-08-13'),
+(5,3,'2019-08-02', '2019-08-02'),
+(6,2,'2019-08-02', '2019-08-02'),
+(7,4,'2019-08-03', '2019-08-03'),
+(8,1,'2019-08-03', '2019-08-03'),
+(9,5,'2019-08-04', '2019-08-08'),
+(10,2,'2019-08-04', '2019-08-18')
+
+select * from delivery
+
+with cte as (select order_date, count(*) as total from delivery group by order_date),
+cte2 as (select order_date, case when order_date = customer_pref_date then 'immediate' else 'scheduled' end as mode from delivery)
+select cte.order_date, round(count(mode)*100/total,2) from cte, cte2 where cte.order_date = cte2.order_date and mode = 'immediate' group by cte.order_date,total;
+
+
+/*calc median*/
+
+WITH RankedData AS (
+    SELECT
+        your_column,
+        ROW_NUMBER() OVER (ORDER BY your_column) AS RowAsc,
+        ROW_NUMBER() OVER (ORDER BY your_column DESC) AS RowDesc
+    FROM
+        your_table
+)
+SELECT
+    AVG(your_column) AS median
+FROM
+    RankedData
+WHERE
+    RowAsc IN ((RowAsc + RowDesc) / 2, (RowAsc + RowDesc - 1) / 2);
